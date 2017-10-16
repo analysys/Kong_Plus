@@ -3,15 +3,15 @@
 首页
 ![](img/index.jpg)
 添加API
-![](addapi.png)
+![](img/addapi.png)
 添加消费者
-![](addconsumer.png)
+![](img/addconsumer.png)
 服务器信息
-![](sinfo.png)
+![](img/sinfo.png)
 调用次数统计
-![](count1.png)
+![](img/count1.png)
 调用次数设置
-![](count2.png)
+![](img/count2.png)
 
 根据自身需求定制的封装Kong的相关功能的Portal。
 
