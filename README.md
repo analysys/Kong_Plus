@@ -14,6 +14,9 @@ Kong的操作是通过命令来实现的，比较抽象，对于真正部署、�
 添加消费者
 ![api](/img/addconsumer.jpg)
 
+IP白名单
+![ip](/img/ip.jpg)
+
 服务器信息
 ![info](/img/sinfo.jpg)
 
@@ -37,3 +40,6 @@ Kong的操作是通过命令来实现的，比较抽象，对于真正部署、�
  - 2 Eclipse导入maven项目
  - 3 修改src/resources下的conf.properties中相关地址的配置
  - 4 打包项目，发布至web服务器运行
+
+## License
+ - Apache Licensed
