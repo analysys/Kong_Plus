@@ -1,7 +1,7 @@
 # Kong Plus (Kong Operation Portal)
 
 首页
-![](index.jpg)
+![](img/index.jpg)
 添加API
 ![](addapi.png)
 添加消费者
