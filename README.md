@@ -1,4 +1,4 @@
-# Kong Plus (A Kong Operation Tool)
+# Kong Plus (A Tool for Operate Kong)
 
 首页
 ![index](/img/index.jpg)
