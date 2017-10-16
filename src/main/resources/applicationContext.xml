@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:context="http://www.springframework.org/schema/context" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx.xsd">
+	<description>Spring common configure</description>
+	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="locations">
+			<list>
+				<value>classpath:conf.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="dataSource" class="com.jolbox.bonecp.BoneCPDataSource" destroy-method="close">
+		<property name="driverClass">
+			<value>${jdbc.ark_base.driver}</value>
+		</property>
+		<property name="jdbcUrl">
+			<value>${jdbc.ark_base.jdbcUrl}</value>
+		</property>
+		<property name="username">
+			<value>${jdbc.ark_base.username}</value>
+		</property>
+		<property name="password">
+			<value>${jdbc.ark_base.password}</value>
+		</property>
+		<property name="idleConnectionTestPeriod" value="6" />
+		<property name="idleMaxAge" value="240" />
+		<property name="maxConnectionsPerPartition" value="3" />
+		<property name="minConnectionsPerPartition" value="1" />
+		<property name="partitionCount" value="3" />
+		<property name="acquireIncrement" value="5" />
+		<property name="poolAvailabilityThreshold" value="10"></property>
+		<property name="connectionTimeout" value="3000"></property>
+	</bean>
+	
+	<context:component-scan base-package="com.analysys.kong">
+		<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />
+		<context:exclude-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice" />
+	</context:component-scan>
+
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage">
+			<value>com.analysys.kong.dao</value>
+		</property>
+	</bean>
+
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource">
+			<ref bean="dataSource" />
+		</property>
+		<property name="typeAliasesPackage" value="com.analysys.model" />
+		<property name="configLocation">
+			<value>classpath:sqlmapconfig.xml</value>
+		</property>
+	</bean>
+
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	<tx:annotation-driven transaction-manager="txManager" />
+	
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="autoStartup">
+            <value>true</value>
+        </property>
+        <property name="triggers">
+            <list>
+                <ref local="qryConditionTrigger"/>
+            </list>
+        </property>
+    </bean>
+    <bean id="qryConditionTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+        <property name="jobDetail">
+            <ref bean="qryConTriggerDetail"/>
+        </property>
+        <property name="cronExpression">
+            <value>${kong.api.callcount.cron}</value>
+        </property>
+    </bean>
+	<bean id="qryConTriggerDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject"><ref bean="queryConditionJob"/></property>
+        <property name="targetMethod"><value>monitorCallsCount</value></property>
+        <property name="concurrent" value="false"/>
+    </bean>
+</beans>

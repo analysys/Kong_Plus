@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.analysys.kong.dao.UserDao">
+
+	<resultMap id="retMap" type="User">
+		<result property="uid" column="id" />
+		<result property="uname" column="name" />
+		<result property="epwd" column="pwd" />
+		<result property="status" column="status" />
+		<result property="createtime" column="created_time" />
+		<result property="sys_type" column="sys_type" />
+		<result property="user_role" column="user_role" />
+		<result property="remarks" column="remarks" />
+		<result property="apicnt" column="apicnt" />
+	</resultMap>
+	
+	<select id="getListByName" parameterType="User" resultMap="retMap">
+		SELECT u.id,u.pwd,u.name,u.status,u.sys_type,u.user_role,u.remarks,DATE_FORMAT(u.created_time,'%Y-%m-%d %H:%i:%S') AS created_time   
+			FROM api_gateway.api_users u
+		WHERE 1=1 
+		<if test="uname != null"> AND name = #{uname} </if>
+		<if test="epwd != null"> AND pwd = #{epwd} </if>
+		<if test="status != null"> AND status = #{status} </if>
+	</select>
+	
+	<select id="getListCountByUser" parameterType="User" resultType="int">
+		SELECT count(1) FROM api_gateway.api_users 
+			WHERE 1=1
+		<if test="uid != null"> AND id = #{uid} </if>
+		<if test="uname != null"> AND name LIKE CONCAT('%',#{uname},'%') </if>
+		<if test="epwd != null"> AND pwd = #{epwd} </if>
+		<if test="status != null"> AND status = #{status} </if>
+		<if test="sys_type != null"> AND sys_type = #{sys_type} </if>
+	</select>
+	
+	<select id="getListByUser" parameterType="User" resultMap="retMap">
+		SELECT u.id,u.pwd,u.name,u.status,u.sys_type,u.user_role,u.remarks,DATE_FORMAT(u.created_time,'%Y-%m-%d %H:%i:%S') AS created_time, tmp.cnt AS apicnt   
+			FROM api_gateway.api_users u LEFT JOIN (SELECT count(1) cnt, a.uid FROM api_gateway.api_define a GROUP BY a.uid) tmp ON u.id = tmp.uid 
+		WHERE 1=1 
+		<if test="uid != null"> AND id = #{uid} </if>
+		<if test="uname != null"> AND name LIKE CONCAT('%',#{uname},'%') </if>
+		<if test="epwd != null"> AND pwd = #{epwd} </if>
+		<if test="status != null"> AND status = #{status} </if>
+		<if test="sys_type != null"> AND sys_type = #{sys_type} </if>
+		ORDER BY u.id DESC LIMIT #{offset}, #{limit}
+	</select>
+	
+	<insert id="insert" parameterType="User">
+		INSERT INTO api_gateway.api_users 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		   <if test="uname != null"> name, </if>
+		   <if test="epwd != null"> pwd, </if>
+		   <if test="status != null"> status, </if>
+		   <if test="sys_type != null"> sys_type, </if>
+		   <if test="user_role != null"> user_role, </if>
+		   <if test="remarks != null"> remarks, </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+		   <if test="uname != null">#{uname},</if>
+		   <if test="epwd != null">#{epwd},</if>
+		   <if test="status != null">#{status},</if>
+		   <if test="sys_type != null">#{sys_type},</if>
+		   <if test="user_role != null">#{user_role},</if>
+		   <if test="remarks != null">#{remarks},</if>
+		</trim>
+	</insert>
+	
+	<update id="update" parameterType="User">
+		UPDATE api_gateway.api_users 
+		<set>
+			<if test="epwd != null"> pwd = #{epwd}, </if>
+		   	<if test="status != null"> status = #{status}, </if>
+		   	<if test="sys_type != null"> sys_type = #{sys_type}, </if>
+		   	<if test="user_role != null"> user_role = #{user_role}, </if>
+		   	<if test="remarks != null"> remarks = #{remarks}, </if>
+		</set>
+   		WHERE 
+   		<if test="uid != null"> id = #{uid} </if>
+   		<if test="uname != null"> name = #{uname} </if>
+	</update>
+</mapper>

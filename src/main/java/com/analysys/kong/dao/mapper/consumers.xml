@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.analysys.kong.dao.ConsumersDao">
+
+	<resultMap id="retMap" type="Consumers">
+		<result property="id" column="id" />
+		<result property="cname" column="name" />
+		<result property="custom_id" column="custom_id" />
+		<result property="uid" column="uid" />
+		<result property="uname" column="uname" />
+		<result property="keys" column="api_key" />
+		<result property="email" column="email" />
+		<result property="remarks" column="remarks" />
+		<result property="auth_type" column="auth_type" />
+		<result property="client_id" column="client_id" />
+		<result property="client_secret" column="client_secret" />
+		<result property="extend" column="extend" />
+		<result property="createtime" column="created_time" />
+	</resultMap>
+	
+	<select id="getListCountByParam" parameterType="Consumers" resultType="int">
+		SELECT count(1) FROM api_gateway.consumers_define 
+			WHERE 1=1
+		<if test="id != null"> AND id != #{id} </if>
+		<if test="cname != null"> AND name = #{cname} </if>
+	</select>
+	
+	<select id="getListCountByConsumers" parameterType="Consumers" resultType="int">
+		SELECT count(1) FROM api_gateway.consumers_define c LEFT JOIN api_gateway.api_users u ON c.uid = u.id 
+			WHERE 1=1
+		<if test="id != null"> AND c.id = #{id} </if>
+		<if test="cname != null"> AND c.name LIKE CONCAT('%',#{cname},'%') </if>
+		<if test="uid != null"> AND u.id = #{uid} </if>
+		<if test="sys_type != null"> AND u.sys_type = #{sys_type} </if>
+	</select>
+	
+	<select id="getListByConsumers" parameterType="Consumers" resultMap="retMap">
+		SELECT c.id,c.name,c.uid,u.name AS uname,c.custom_id,c.api_key,c.email,c.remarks,c.extend,c.client_id,c.client_secret,c.auth_type,DATE_FORMAT(c.created_time,'%Y-%m-%d %H:%i:%S') AS created_time   
+			FROM api_gateway.consumers_define c LEFT JOIN api_gateway.api_users u ON c.uid = u.id 
+		WHERE 1=1 
+		<if test="id != null"> AND c.id = #{id} </if>
+		<if test="cname != null"> AND c.name LIKE CONCAT('%',#{cname},'%') </if>
+		<if test="uid != null"> AND u.id = #{uid} </if>
+		<if test="sys_type != null"> AND u.sys_type = #{sys_type} </if>
+		ORDER BY c.created_time DESC LIMIT #{offset}, #{limit}
+	</select>
+	
+	<select id="getApiConsumersList" parameterType="ApiConsumers" resultMap="retMap">
+		SELECT c.id,c.name
+			FROM api_gateway.consumers_define c LEFT JOIN api_gateway.api_users u ON c.uid = u.id 
+		WHERE NOT EXISTS (SELECT consumer_id FROM api_gateway.api_acls ac WHERE c.id = ac.consumer_id
+			<if test="api_id != null"> AND ac.api_id = #{api_id} </if>
+		)
+		<if test="auth_type != null"> AND c.auth_type = #{auth_type} </if>
+		<if test="sys_type != null"> AND u.sys_type = #{sys_type} </if>
+		ORDER BY c.created_time DESC 
+	</select>
+	
+	<insert id="insert" parameterType="Consumers">
+		INSERT INTO api_gateway.consumers_define 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		   <if test="id != null"> id, </if>
+		   <if test="cname != null"> name, </if>
+		   <if test="uid != null"> uid, </if>
+		   <if test="custom_id != null"> custom_id, </if>
+		   <if test="email != null"> email, </if>
+		   <if test="remarks != null"> remarks, </if>
+		   <if test="keys != null"> api_key, </if>
+		   <if test="auth_type != null"> auth_type, </if>
+		   <if test="client_id != null"> client_id, </if>
+		   <if test="client_secret != null"> client_secret, </if>
+		   <if test="extend != null"> extend, </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+		   <if test="id != null">#{id},</if>
+		   <if test="cname != null">#{cname},</if>
+		   <if test="uid != null">#{uid},</if>
+		   <if test="custom_id != null">#{custom_id},</if>
+		   <if test="email != null">#{email},</if>
+		   <if test="remarks != null">#{remarks},</if>
+		   <if test="keys != null">#{keys},</if>
+		   <if test="auth_type != null">#{auth_type},</if>
+		   <if test="client_id != null">#{client_id},</if>
+		   <if test="client_secret != null">#{client_secret},</if>
+		   <if test="extend != null">#{extend},</if>
+		</trim>
+	</insert>
+	
+	<update id="update" parameterType="Consumers">
+		UPDATE api_gateway.consumers_define 
+		<set>
+			<if test="cname != null"> name = #{cname}, </if>
+		   	<if test="uid != null"> uid = #{uid}, </if>
+		   	<if test="email != null"> email = #{email}, </if>
+		   	<if test="remarks != null"> remarks = #{remarks}, </if>
+		   	<if test="keys != null"> api_key = #{keys}, </if>
+		   	<if test="client_id != null"> client_id = #{client_id}, </if>
+		   	<if test="client_secret != null"> client_secret = #{client_secret}, </if>
+		   	<if test="extend != null"> extend = #{extend}, </if>
+		</set>
+   		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="Consumers">
+		DELETE FROM api_gateway.consumers_define WHERE id = #{id}
+	</delete>
+</mapper>

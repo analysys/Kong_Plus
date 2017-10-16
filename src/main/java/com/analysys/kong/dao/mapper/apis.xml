@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.analysys.kong.dao.ApisDao">
+
+	<resultMap id="retMap" type="Apis">
+		<result property="id" column="id" />
+		<result property="aname" column="name" />
+		<result property="uid" column="uid" />
+		<result property="uname" column="uname" />
+		<result property="visit_url" column="visit_url" />
+		<result property="req_host" column="req_host" />
+		<result property="req_path" column="req_path" />
+		<result property="auth_type" column="auth_type" />
+		<result property="remarks" column="remarks" />
+		<result property="whitelist" column="acl_whitelist" />
+		<result property="ip_whitelist" column="ip_whitelist" />
+		<result property="log_file" column="log_file" />
+		<result property="createtime" column="created_time" />
+		<result property="consumer_cnt" column="consumer_cnt" />
+		<result property="log_cnt" column="log_cnt" />
+		<result property="call_total" column="call_total" />
+		<result property="call_ok" column="call_ok" />
+		<result property="extend" column="extend" />
+	</resultMap>
+	<resultMap id="retConsumersMap" type="ApiConsumers">
+		<result property="id" column="id" />
+		<result property="api_id" column="api_id" />
+		<result property="consumer_id" column="consumer_id" />
+		<result property="consumer_name" column="consumer_name" />
+		<result property="max_callcount" column="max_callcount" />
+		<result property="max_callcount_ok" column="max_callcount_ok" />
+		<result property="remarks" column="remarks" />
+		<result property="sys_type" column="sys_type" />
+		<result property="keys" column="api_key" />
+		<result property="client_id" column="client_id" />
+		<result property="client_secret" column="client_secret" />
+		<result property="provision_key" column="provision_key" />
+		<result property="createtime" column="created_time" />
+		<result property="extend" column="extend" />
+	</resultMap>
+	<resultMap id="retLogMap" type="ApiLogs">
+		<result property="started_at" column="started_at" />
+		<result property="response_size" column="response_size" />
+		<result property="response_status" column="response_status" />
+		<result property="request_method" column="request_method" />
+		<result property="request_uri" column="request_uri" />
+		<result property="request_size" column="request_size" />
+		<result property="request_real_uri" column="request_real_uri" />
+		<result property="x_consumer_id" column="x_consumer_id" />
+		<result property="x_forwarded_for" column="x_forwarded_for" />
+		<result property="x_real_ip" column="x_real_ip" />
+		<result property="x_consumer_username" column="x_consumer_username" />
+		<result property="api_id" column="api_id" />
+		<result property="api_name" column="api_name" />
+		<result property="latencies_kong" column="latencies_kong" />
+		<result property="latencies_proxy" column="latencies_proxy" />
+		<result property="latencies_request" column="latencies_request" />
+	</resultMap>
+	<resultMap id="retoAuthMap" type="ApioAuth">
+		<result property="api_id" column="api_id" />
+		<result property="plugin_id" column="plugin_id" />
+		<result property="scope" column="scope" />
+		<result property="scope_need" column="scope_need" />
+		<result property="expiration" column="expiration" />
+		<result property="grant_type" column="grant_type" />
+		<result property="provision_key" column="provision_key" />
+		<result property="createtime" column="createtime" />
+		<result property="extend" column="extend" />
+	</resultMap>
+	
+	<select id="getListCountByParam" parameterType="Apis" resultType="int">
+		SELECT count(1) FROM api_gateway.api_define 
+			WHERE 1=1 
+		<if test="id != null"> AND id != #{id} </if>
+		<if test="aname != null"> AND name = #{aname} </if>
+		<if test="req_host != null"> AND req_host = #{req_host} </if>
+		<if test="req_path != null"> AND req_path = #{req_path} </if>
+	</select>
+	
+	<select id="getListCountByApis" parameterType="Apis" resultType="int">
+		SELECT count(1) FROM api_gateway.api_define a LEFT JOIN api_gateway.api_users u ON a.uid = u.id 
+			WHERE 1=1 
+		<if test="id != null"> AND a.id = #{id} </if>
+		<if test="uid != null"> AND a.uid = #{uid} </if>
+		<if test="aname != null"> AND a.name LIKE CONCAT('%',#{aname},'%') </if>
+		<if test="sys_type != null"> AND u.sys_type = #{sys_type} </if>
+	</select>
+	
+	<select id="getListByApis" parameterType="Apis" resultMap="retMap">
+		SELECT a.id,a.name,a.uid,u.name AS uname,a.visit_url,a.req_host,a.req_path,a.acl_whitelist,a.ip_whitelist,a.log_file,a.extend,a.auth_type,a.remarks,DATE_FORMAT(a.created_time,'%Y-%m-%d %H:%i:%S') AS created_time, tmp.cnt AS consumer_cnt, a.call_total AS log_cnt, a.call_total, a.call_ok   
+			FROM api_gateway.api_define a 
+			LEFT JOIN api_gateway.api_users u ON a.uid = u.id 
+			LEFT JOIN (SELECT count(1) cnt, c.api_id FROM api_gateway.api_acls c GROUP BY c.api_id) tmp ON a.id = tmp.api_id 
+			<!-- LEFT JOIN (SELECT count(1) cnt, l.api_id FROM api_gateway.api_logs l GROUP BY l.api_id) tmp1 ON a.id = tmp1.api_id -->
+		WHERE 1=1 
+		<if test="id != null"> AND a.id = #{id} </if>
+		<if test="uid != null"> AND a.uid = #{uid} </if>
+		<if test="aname != null"> AND a.name LIKE CONCAT('%',#{aname},'%') </if>
+		<if test="sys_type != null"> AND u.sys_type = #{sys_type} </if>
+		ORDER BY a.created_time DESC LIMIT #{offset}, #{limit}
+	</select>
+	
+	<insert id="insert" parameterType="Apis">
+		INSERT INTO api_gateway.api_define 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		   <if test="id != null"> id, </if>
+		   <if test="aname != null"> name, </if>
+		   <if test="uid != null"> uid, </if>
+		   <if test="visit_url != null"> visit_url, </if>
+		   <if test="req_host != null"> req_host, </if>
+		   <if test="req_path != null"> req_path, </if>
+		   <if test="auth_type != null"> auth_type, </if>
+		   <if test="whitelist != null"> acl_whitelist, </if>
+		   <if test="ip_whitelist != null"> ip_whitelist, </if>
+		   <if test="remarks != null"> remarks, </if>
+		   <if test="log_file != null"> log_file, </if>
+		   <if test="extend != null"> extend, </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+		   <if test="id != null">#{id},</if>
+		   <if test="aname != null">#{aname},</if>
+		   <if test="uid != null">#{uid},</if>
+		   <if test="visit_url != null">#{visit_url},</if>
+		   <if test="req_host != null">#{req_host},</if>
+		   <if test="req_path != null">#{req_path},</if>
+		   <if test="auth_type != null">#{auth_type},</if>
+		   <if test="whitelist != null">#{whitelist},</if>
+		   <if test="ip_whitelist != null">#{ip_whitelist},</if>
+		   <if test="remarks != null">#{remarks},</if>
+		   <if test="log_file != null">#{log_file},</if>
+		   <if test="extend != null">#{extend},</if>
+		</trim>
+	</insert>
+	
+	<update id="update" parameterType="Apis">
+		UPDATE api_gateway.api_define 
+		<set>
+			<if test="aname != null"> name = #{aname}, </if>
+		   	<if test="uid != null"> uid = #{uid}, </if>
+		   	<if test="visit_url != null"> visit_url = #{visit_url}, </if>
+		   	<if test="req_host != null"> req_host = #{req_host}, </if>
+		   	<if test="req_path != null"> req_path = #{req_path}, </if>
+		   	<if test="remarks != null"> remarks = #{remarks}, </if>
+		   	<if test="ip_whitelist != null"> ip_whitelist = #{ip_whitelist}, </if>
+		   	<if test="log_file != null"> log_file = #{log_file}, </if>
+		   	<if test="call_total != null"> call_total = call_total + #{call_total}, </if>
+		   	<if test="call_ok != null"> call_ok = call_ok + #{call_ok}, </if>
+		   	<if test="extend != null"> extend = #{extend}, </if>
+		</set>
+   		WHERE id = #{id}
+	</update>
+	
+	<delete id="delete" parameterType="Apis">
+		DELETE FROM api_gateway.api_define WHERE id = #{id}
+	</delete>
+	
+	<select id="getConsumersByApis" parameterType="ApiConsumers" resultMap="retConsumersMap">
+		SELECT c.id,c.api_id,c.consumer_id,cd.name AS consumer_name,cd.api_key,cd.client_id,cd.client_secret,c.remarks,c.max_callcount,c.max_callcount_ok,c.sys_type,c.extend,DATE_FORMAT(c.created_time,'%Y-%m-%d %H:%i:%S') AS created_time
+			FROM api_gateway.api_acls c JOIN api_gateway.consumers_define cd ON c.consumer_id = cd.id
+		WHERE c.api_id = #{api_id} ORDER BY c.id DESC
+	</select>
+	
+	<select id="getAllConsumersForoAuth" parameterType="ApiConsumers" resultMap="retConsumersMap">
+		SELECT cd.id,cd.name AS consumer_name,cd.api_key,cd.client_id,cd.client_secret,cd.extend AS remarks,u.sys_type,DATE_FORMAT(cd.created_time,'%Y-%m-%d %H:%i:%S') AS created_time
+			FROM api_gateway.consumers_define cd JOIN api_gateway.api_users u ON cd.uid = u.id 
+		WHERE cd.auth_type = #{auth_type} ORDER BY cd.id DESC
+	</select>
+	
+	<select id="getProvisionKeyForoAuth" parameterType="ApiConsumers" resultType="String">
+		SELECT ao.provision_key FROM api_gateway.api_oauth2 ao WHERE ao.api_id = #{api_id}
+	</select>
+	
+	<insert id="insertConsumers" parameterType="ApiConsumers">
+		INSERT INTO api_gateway.api_acls 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		   <if test="api_id != null"> api_id, </if>
+		   <if test="consumer_id != null"> consumer_id, </if>
+		   <if test="remarks != null"> remarks, </if>
+		   <if test="max_callcount != null"> max_callcount, </if>
+		   <if test="max_callcount_ok != null"> max_callcount_ok, </if>
+		   <if test="sys_type != null"> sys_type, </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+		   <if test="api_id != null">#{api_id},</if>
+		   <if test="consumer_id != null">#{consumer_id},</if>
+		   <if test="remarks != null">#{remarks},</if>
+		   <if test="max_callcount != null">#{max_callcount},</if>
+		   <if test="max_callcount_ok != null">#{max_callcount_ok},</if>
+		   <if test="sys_type != null">#{sys_type},</if>
+		</trim>
+	</insert>
+	
+	<update id="updateConsumers" parameterType="ApiConsumers">
+		UPDATE api_gateway.api_acls 
+		<set>
+			<if test="api_id != null"> api_id = #{api_id}, </if>
+		   	<if test="consumer_id != null"> consumer_id = #{consumer_id}, </if>
+		   	<if test="remarks != null"> remarks = #{remarks}, </if>
+		   	<if test="sys_type != null"> sys_type = #{sys_type}, </if>
+		   	<if test="max_callcount != null"> max_callcount = #{max_callcount}, </if>
+		   	<if test="max_callcount_ok != null"> max_callcount_ok = #{max_callcount_ok}, </if>
+		   	<if test="extend != null"> extend = #{extend}, </if>
+		</set>
+   		WHERE 
+	   		<if test="id != null"> id = #{id} </if>
+	   		<if test="api_id != null and consumer_id != null"> api_id = #{api_id} AND consumer_id = #{consumer_id} </if>
+	</update>
+	
+	<delete id="deleteConsumers" parameterType="ApiConsumers">
+		DELETE FROM api_gateway.api_acls 
+			WHERE 
+		<if test="id != null"> id = #{id} </if>
+		<if test="consumer_id != null"> consumer_id = #{consumer_id} </if>
+	</delete>
+	
+	<insert id="addLogs" parameterType="ApiLogs">
+		INSERT INTO api_gateway.api_logs 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		   <if test="started_at != null"> started_at, </if>
+		   <if test="response_size != null"> response_size, </if>
+		   <if test="response_status != null"> response_status, </if>
+		   <if test="request_method != null"> request_method, </if>
+		   <if test="request_uri != null"> request_uri, </if>
+		   <if test="request_size != null"> request_size, </if>
+		   <if test="request_real_uri != null"> request_real_uri, </if>
+		   <if test="x_consumer_id != null"> x_consumer_id, </if>
+		   <if test="x_forwarded_for != null"> x_forwarded_for, </if>
+		   <if test="x_real_ip != null"> x_real_ip, </if>
+		   <if test="x_consumer_username != null"> x_consumer_username, </if>
+		   <if test="client_ip != null"> client_ip, </if>
+		   <if test="api_id != null"> api_id, </if>
+		   <if test="api_name != null"> api_name, </if>
+		   <if test="latencies_kong != null"> latencies_kong, </if>
+		   <if test="latencies_proxy != null"> latencies_proxy, </if>
+		   <if test="latencies_request != null"> latencies_request, </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+		   <if test="started_at != null">#{started_at},</if>
+		   <if test="response_size != null">#{response_size},</if>
+		   <if test="response_status != null">#{response_status},</if>
+		   <if test="request_method != null">#{request_method},</if>
+		   <if test="request_uri != null">#{request_uri},</if>
+		   <if test="request_size != null">#{request_size},</if>
+		   <if test="request_real_uri != null">#{request_real_uri},</if>
+		   <if test="x_consumer_id != null">#{x_consumer_id},</if>
+		   <if test="x_forwarded_for != null">#{x_forwarded_for},</if>
+		   <if test="x_real_ip != null">#{x_real_ip},</if>
+		   <if test="x_consumer_username != null">#{x_consumer_username},</if>
+		   <if test="client_ip != null">#{client_ip},</if>
+		   <if test="api_id != null">#{api_id},</if>
+		   <if test="api_name != null">#{api_name},</if>
+		   <if test="latencies_kong != null">#{latencies_kong},</if>
+		   <if test="latencies_proxy != null">#{latencies_proxy},</if>
+		   <if test="latencies_request != null">#{latencies_request},</if>
+		</trim>
+	</insert>
+	
+	<select id="getLogListCountByApis" parameterType="ApiLogs" resultType="int">
+		SELECT count(1) FROM api_gateway.api_logs l 
+			WHERE 1=1 
+		<if test="api_id != null"> AND l.api_id = #{api_id} </if>
+		<if test="x_consumer_username != null"> AND l.x_consumer_username = #{x_consumer_username} </if>
+		<if test="response_status != null"> AND l.response_status = #{response_status} </if>
+	</select>
+	
+	<select id="getLogListByApis" parameterType="ApiLogs" resultMap="retLogMap">
+		SELECT FROM_UNIXTIME(l.started_at/1000,'%Y-%m-%d %k:%i:%s') AS started_at,l.response_size,l.response_status,l.request_method,l.request_uri,l.request_size,l.request_real_uri,l.x_consumer_id,l.x_forwarded_for,l.x_real_ip,l.x_consumer_username,l.client_ip,l.api_id,l.api_name,l.latencies_kong,l.latencies_proxy,l.latencies_request    
+			FROM api_gateway.api_logs l 
+		WHERE 1=1 
+		<if test="api_id != null"> AND l.api_id = #{api_id} </if>
+		<if test="x_consumer_username != null"> AND l.x_consumer_username = #{x_consumer_username} </if>
+		<if test="response_status != null"> AND l.response_status = #{response_status} </if>
+		ORDER BY l.id DESC LIMIT #{offset}, #{limit}
+	</select>
+	
+	<select id="getApioAuthList" parameterType="ApioAuth" resultMap="retoAuthMap">
+		SELECT a.api_id,a.plugin_id,a.scope,a.scope_need,a.expiration,a.grant_type,a.provision_key,a.extend,DATE_FORMAT(a.created_time,'%Y-%m-%d %H:%i:%S') AS createtime 
+			FROM api_gateway.api_oauth2 a 
+		WHERE 1=1 
+		<if test="api_id != null"> AND a.api_id = #{api_id} </if>
+	</select>
+	
+	<insert id="addOauth" parameterType="ApioAuth">
+		INSERT INTO api_gateway.api_oauth2 
+		<trim prefix="(" suffix=")" suffixOverrides=",">
+		   <if test="api_id != null"> api_id, </if>
+		   <if test="plugin_id != null"> plugin_id, </if>
+		   <if test="scope != null"> scope, </if>
+		   <if test="scope_need != null"> scope_need, </if>
+		   <if test="expiration != null"> expiration, </if>
+		   <if test="grant_type != null"> grant_type, </if>
+		   <if test="provision_key != null"> provision_key, </if>
+		   <if test="extend != null"> extend, </if>
+		</trim>
+		<trim prefix="values (" suffix=")" suffixOverrides=",">
+		   <if test="api_id != null">#{api_id},</if>
+		   <if test="plugin_id != null">#{plugin_id},</if>
+		   <if test="scope != null">#{scope},</if>
+		   <if test="scope_need != null">#{scope_need},</if>
+		   <if test="expiration != null">#{expiration},</if>
+		   <if test="grant_type != null">#{grant_type},</if>
+		   <if test="provision_key != null">#{provision_key},</if>
+		   <if test="extend != null">#{extend},</if>
+		</trim>
+	</insert>
+	
+	<select id="getConsumerCallCount" resultType="map">
+		SELECT tmp.cnt, tmp1.cnt AS call_ok, tmp.api_id, tmp.x_consumer_id, ac.max_callcount, ac.max_callcount_ok, cd.email,ad.name AS aname, ad.remarks AS ar, cd.name AS cname, cd.remarks AS cr 
+		FROM (SELECT count(1) AS cnt, x_consumer_id, api_id FROM api_gateway.api_logs GROUP BY x_consumer_id, api_id) tmp 
+			JOIN (SELECT count(1) AS cnt, x_consumer_id, api_id FROM api_gateway.api_logs WHERE response_status = '200' GROUP BY x_consumer_id, api_id) tmp1 ON tmp.api_id = tmp1.api_id AND tmp.x_consumer_id = tmp1.x_consumer_id 
+			JOIN api_gateway.api_acls ac ON tmp.x_consumer_id = ac.consumer_id AND tmp.api_id = ac.api_id 
+			JOIN api_gateway.consumers_define cd ON tmp.x_consumer_id = cd.id 
+			JOIN api_gateway.api_define ad ON tmp.api_id = ad.id
+	</select>
+	
+	<select id="reportConsumerCallCount" parameterType="ApiLogs" resultType="map">
+		SELECT c.name AS cname,ac.max_callcount,ac.max_callcount_ok,tmp.cnt,tmp_ok.cnt AS cnt_ok FROM api_acls ac 
+			JOIN consumers_define c ON ac.consumer_id = c.id
+			JOIN (SELECT count(1) AS cnt, x_consumer_id, api_id FROM api_gateway.api_logs WHERE api_id = #{api_id} GROUP BY x_consumer_id, api_id) tmp ON ac.api_id = tmp.api_id AND ac.consumer_id = tmp.x_consumer_id
+			JOIN (SELECT count(1) AS cnt, x_consumer_id, api_id FROM api_gateway.api_logs WHERE api_id = #{api_id} AND response_status = '200' GROUP BY x_consumer_id, api_id) tmp_ok ON ac.api_id = tmp_ok.api_id AND ac.consumer_id = tmp_ok.x_consumer_id
+		WHERE ac.api_id = #{api_id}
+	</select>
+	
+	<select id="getStatusCallCount" parameterType="ApiLogs" resultType="map">
+		SELECT count(1) as scnt, response_status as rstatus FROM api_logs 
+		WHERE api_id = #{api_id} 
+		<if test="response_status != null"> AND response_status = #{response_status} </if>
+		group by response_status
+	</select>
+</mapper>
