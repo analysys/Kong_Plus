@@ -321,27 +321,9 @@
 	</build>
 	<profiles>
 		<profile>
-			<id>test</id>
+			<id>line</id>
 				<properties>
 					<file-directory>src/main/resources</file-directory>
-            	</properties>
-            <activation>
-                   <activeByDefault>false</activeByDefault>
-            </activation>
-       </profile>
-       <profile>
-			<id>pre</id>
-				<properties>
-					<file-directory>src/main/resources_pre</file-directory>
-            	</properties>
-            <activation>
-                   <activeByDefault>false</activeByDefault>
-            </activation>
-       </profile>
-       <profile>
-			<id>online</id>
-				<properties>
-					<file-directory>src/main/resources_line</file-directory>
             	</properties>
             <activation>
                    <activeByDefault>false</activeByDefault>
