@@ -32,6 +32,8 @@ Kong的操作是通过命令来实现的，比较抽象，对于真正部署、�
  - src/webapp: 页面及资源文件
  - sql: 数据库及表创建脚本
 
-## 脚本
- - script/snappy_file.py: 文件压缩/解压脚本
- - script/synch_file.py: 文件传输脚本
+## 运行
+ - 1. 初始化数据库： 运行sql下的.sql文件，初始化数据库以及表
+ - 2. Eclipse导入maven项目
+ - 3. 修改src/resources下的conf.properties中相关地址的配置
+ - 4. 打包项目，发布至web服务器运行
