@@ -2,16 +2,22 @@
 
 首页
 ![index](/img/index.jpg)
+***
 添加API
 ![api](/img/addapi.png)
+***
 添加消费者
 ![api](/img/addconsumer.png)
+***
 服务器信息
 ![info](/img/sinfo.png)
+***
 调用次数统计
 ![call](/img/count1.png)
+***
 调用次数设置
 ![call](/img/count2.png)
+***
 
 根据自身需求定制的封装Kong的相关功能的Portal。
 
