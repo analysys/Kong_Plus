@@ -27,9 +27,9 @@ Kong的操作是通过命令来实现的，比较抽象，对于真正部署、�
 ------
 
 ## 说明
- - src/java: 程序源码
- - src/resources: 配置文件
- - src/webapp: 页面及资源文件
+ - src/main/java: 程序源码
+ - src/main/resources: 配置文件
+ - src/main/webapp: 页面及资源文件
  - sql: 数据库及表创建脚本
 
 ## 运行
