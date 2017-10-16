@@ -1,9 +1,9 @@
 /*
 Navicat MySQL Data Transfer
 
-Source Server         : 192.168.220.167
+Source Server         : 127.0.0.1
 Source Server Version : 50635
-Source Host           : 192.168.220.167:3306
+Source Host           : 127.0.0.1:3306
 Source Database       : api_gateway
 
 Target Server Type    : MYSQL
