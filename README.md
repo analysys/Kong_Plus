@@ -1,4 +1,4 @@
-# Kong Plus (A Tool for Operate Kong)
+# 易观Kong Plus (A Tool for Operate Kong)
 
 易观根据自身需求定制的封装Kong的相关功能的简单Portal。
 
