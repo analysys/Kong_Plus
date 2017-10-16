@@ -4,7 +4,7 @@
 <div class="topbar-inner clearfix">
 	<div class="topbar-logo-wrap clearfix">
 		<ul class="navbar-list clearfix">
-			<li><a href="#" onclick="gohome();">首页</a></li>
+			<li><a href="#" onclick="gohome();"><img src="${ctx}/images/logos.png" width="20%" /></a></li>
 		</ul>
 	</div>
 	<div class="top-info-wrap">

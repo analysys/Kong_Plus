@@ -115,7 +115,7 @@
 		<div class="topbar-inner clearfix">
 			<div class="topbar-logo-wrap clearfix">
 				<ul class="navbar-list clearfix">
-					<li>API Gateway</li>
+					<li><img src="${ctx}/images/logos.png" width="20%" /></li>
 				</ul>
 			</div>
 		</div>

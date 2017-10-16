@@ -60,7 +60,7 @@ article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{di
 .icon-font { font-family:'icomoon'; speak:none; font-weight:400; font-style:normal; font-variant:normal; text-transform:none; line-height:1; -webkit-font-smoothing:antialiased; }
 .require-red{color:#f60;font-family:serif;margin-right:3px;}
 /* common */
-.topbar-wrap{height:65px;line-height:65px;background:#37b7f5;}
+.topbar-wrap{height:65px;line-height:65px;background:#000000;}
 .topbar-logo-wrap{float:left;}
 .topbar-inner{font-size:18px;padding:0 20px;}
 .topbar-logo{float:left;width:150px;text-align:center;}
