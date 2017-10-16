@@ -1,17 +1,17 @@
 # Kong Plus (Kong Operation Portal)
 
 首页
-![](img/index.jpg)
+![index](/img/index.jpg)
 添加API
-![](img/addapi.png)
+![api](/img/addapi.png)
 添加消费者
-![](img/addconsumer.png)
+![api](/img/addconsumer.png)
 服务器信息
-![](img/sinfo.png)
+![info](/img/sinfo.png)
 调用次数统计
-![](img/count1.png)
+![call](/img/count1.png)
 调用次数设置
-![](img/count2.png)
+![call](/img/count2.png)
 
 根据自身需求定制的封装Kong的相关功能的Portal。
 
