@@ -21,15 +21,13 @@
 ![call](/img/count2.jpg)
 
 
-
-
 ------
 
 ## 说明
  - src/java: 程序源码
  - src/resources: 配置文件
- - Consumer.java: 消费者
- - ProducerFromFile.java: 生产者
+ - src/webapp: 页面及资源文件
+ - sql: 数据库及表创建脚本
 
 ## 脚本
  - script/snappy_file.py: 文件压缩/解压脚本
