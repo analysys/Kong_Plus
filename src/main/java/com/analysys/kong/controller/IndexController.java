@@ -85,6 +85,11 @@ public class IndexController {
         return "home";
     }
     
+    @RequestMapping("/gyapi")
+    public String gyapi(HttpServletRequest request, HttpServletResponse response, HttpSession session) {
+        return "gyapi";
+    }
+    
     private void recordSession(HttpServletRequest request, List<User> userList){
     	request.getSession().setAttribute("user_login", userList.get(0));
     }

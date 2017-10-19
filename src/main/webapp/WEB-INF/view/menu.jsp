@@ -24,6 +24,8 @@
 			<li id="sercluster"><a href="${ctx}/kong/sercluster.do" class="bigTag">集群信息</a></li>
 			<li id="serapi"><a href="${ctx}/kong/serapi.do" class="bigTag">服务器API列表</a></li>
 			<li id="serdiv"><a href="${ctx}/kong/toserdiv.do" class="bigTag">自定义查询</a></li>
+			<li><b>锆云</b></li>
+			<li id="gyapi"><a href="${ctx}/gyapi.do" class="bigTag">锆云API</a></li>
 		</ul>
 	</div>
 <%}else{%>
@@ -36,6 +38,8 @@
 			<li><b>插件</b></li>
 			<li id="ipre"><a href="${ctx}/plugin/tolist.do" class="bigTag">IP限制</a></li>
 			<li id="logre"><a href="${ctx}/plugin/tologlist.do" class="bigTag">日志文件</a></li>
+			<li><b>锆云</b></li>
+			<li id="gyapi"><a href="${ctx}/gyapi.do" class="bigTag">锆云API</a></li>
 		</ul>
 	</div>
 <%}%>
