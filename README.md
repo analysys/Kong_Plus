@@ -1,4 +1,4 @@
-# 易观Kong Plus (A Tool for Operate Kong)
+# 易观KongPlus (A Tool for Operate Kong)
 
 易观根据自身需求定制的封装Kong的相关功能的简单Portal。
 
@@ -42,4 +42,8 @@ IP白名单
  - 4 打包项目，发布至web服务器运行
 
 ## License
+<<<<<<< HEAD
    Apache Licensed
+=======
+   Apache Licensed
+>>>>>>> a773660ab4654b7addc9db68c6692b554aad8ac4
