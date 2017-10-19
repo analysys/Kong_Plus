@@ -26,6 +26,9 @@ IP白名单
 调用次数设置
 ![call](/img/count2.jpg)
 
+锆云API
+![call](/img/gy.jpg)
+
 
 ------
 
@@ -42,8 +45,4 @@ IP白名单
  - 4 打包项目，发布至web服务器运行
 
 ## License
-<<<<<<< HEAD
    Apache Licensed
-=======
-   Apache Licensed
->>>>>>> a773660ab4654b7addc9db68c6692b554aad8ac4
